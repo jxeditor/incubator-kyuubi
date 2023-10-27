@@ -15,22 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.kyuubi.plugin.spark.authz.util
+import { defineStore } from 'pinia'
+import { Theme } from './type'
 
-import org.apache.spark.sql.catalyst.catalog.CatalogTable
-import org.apache.spark.sql.catalyst.expressions.Attribute
-import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, UnaryNode}
-
-case class PermanentViewMarker(
-    child: LogicalPlan,
-    catalogTable: CatalogTable,
-    visitColNames: Seq[String],
-    isSubqueryExpressionPlaceHolder: Boolean = false) extends UnaryNode
-  with WithInternalChild {
-
-  override def output: Seq[Attribute] = child.output
-
-  override def withNewChildInternal(newChild: LogicalPlan): LogicalPlan =
-    copy(child = newChild)
-
-}
+export const useEditorStore = defineStore({
+  id: 'editor',
+  state: (): { theme: Theme } => ({
+    theme: 'light'
+  }),
+  persist: true,
+  getters: {
+    getCurrentTheme(): Theme {
+      return this.theme
+    }
+  },
+  actions: {
+    setCurrentTheme(theme: Theme): void {
+      this.theme = theme
+    }
+  }
+})
