@@ -1400,7 +1400,7 @@
   } ],
   "uriDescs" : [ {
     "fieldName" : "options",
-    "fieldExtractor" : "OptionsUriExtractor",
+    "fieldExtractor" : "PropertiesPathUriExtractor",
     "isInput" : false
   } ]
 }, {
@@ -2087,6 +2087,30 @@
     "fieldName" : "source",
     "fieldExtractor" : "LogicalPlanQueryExtractor"
   } ],
+  "uriDescs" : [ ]
+}, {
+  "classname" : "org.apache.spark.sql.delta.commands.OptimizeTableCommand",
+  "tableDescs" : [ {
+    "fieldName" : "child",
+    "fieldExtractor" : "ResolvedTableTableExtractor",
+    "columnDesc" : null,
+    "actionTypeDesc" : null,
+    "tableTypeDesc" : null,
+    "catalogDesc" : null,
+    "isInput" : false,
+    "setCurrentDatabaseIfMissing" : false
+  }, {
+    "fieldName" : "tableId",
+    "fieldExtractor" : "TableIdentifierOptionTableExtractor",
+    "columnDesc" : null,
+    "actionTypeDesc" : null,
+    "tableTypeDesc" : null,
+    "catalogDesc" : null,
+    "isInput" : false,
+    "setCurrentDatabaseIfMissing" : false
+  } ],
+  "opType" : "ALTERTABLE_COMPACT",
+  "queryDescs" : [ ],
   "uriDescs" : [ ]
 }, {
   "classname" : "org.apache.spark.sql.delta.commands.UpdateCommand",
