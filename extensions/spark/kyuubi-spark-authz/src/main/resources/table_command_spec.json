@@ -156,6 +156,10 @@
     "fieldName" : "properties",
     "fieldExtractor" : "PropertiesLocationUriExtractor",
     "isInput" : false
+  }, {
+    "fieldName" : "tableName",
+    "fieldExtractor" : "IdentifierURIExtractor",
+    "isInput" : false
   } ]
 }, {
   "classname" : "org.apache.spark.sql.catalyst.plans.logical.CreateTableAsSelect",
@@ -224,6 +228,10 @@
   "uriDescs" : [ {
     "fieldName" : "properties",
     "fieldExtractor" : "PropertiesLocationUriExtractor",
+    "isInput" : false
+  }, {
+    "fieldName" : "tableName",
+    "fieldExtractor" : "IdentifierURIExtractor",
     "isInput" : false
   } ]
 }, {
@@ -519,6 +527,10 @@
   }, {
     "fieldName" : "properties",
     "fieldExtractor" : "PropertiesLocationUriExtractor",
+    "isInput" : false
+  }, {
+    "fieldName" : "tableName",
+    "fieldExtractor" : "IdentifierURIExtractor",
     "isInput" : false
   } ]
 }, {
@@ -2133,19 +2145,6 @@
 }, {
   "classname" : "org.apache.spark.sql.delta.commands.DeleteCommand",
   "tableDescs" : [ {
-    "fieldName" : "catalogTable",
-    "fieldExtractor" : "CatalogTableOptionTableExtractor",
-    "columnDesc" : null,
-    "actionTypeDesc" : {
-      "fieldName" : null,
-      "fieldExtractor" : null,
-      "actionType" : "UPDATE"
-    },
-    "tableTypeDesc" : null,
-    "catalogDesc" : null,
-    "isInput" : false,
-    "setCurrentDatabaseIfMissing" : false
-  }, {
     "fieldName" : "target",
     "fieldExtractor" : "SubqueryAliasTableExtractor",
     "columnDesc" : null,
@@ -2161,7 +2160,11 @@
   } ],
   "opType" : "QUERY",
   "queryDescs" : [ ],
-  "uriDescs" : [ ]
+  "uriDescs" : [ {
+    "fieldName" : "target",
+    "fieldExtractor" : "SubqueryAliasURIExtractor",
+    "isInput" : false
+  } ]
 }, {
   "classname" : "org.apache.spark.sql.delta.commands.MergeIntoCommand",
   "tableDescs" : [ {
@@ -2211,19 +2214,6 @@
 }, {
   "classname" : "org.apache.spark.sql.delta.commands.UpdateCommand",
   "tableDescs" : [ {
-    "fieldName" : "catalogTable",
-    "fieldExtractor" : "CatalogTableOptionTableExtractor",
-    "columnDesc" : null,
-    "actionTypeDesc" : {
-      "fieldName" : null,
-      "fieldExtractor" : null,
-      "actionType" : "UPDATE"
-    },
-    "tableTypeDesc" : null,
-    "catalogDesc" : null,
-    "isInput" : false,
-    "setCurrentDatabaseIfMissing" : false
-  }, {
     "fieldName" : "target",
     "fieldExtractor" : "SubqueryAliasTableExtractor",
     "columnDesc" : null,
@@ -2239,5 +2229,9 @@
   } ],
   "opType" : "QUERY",
   "queryDescs" : [ ],
-  "uriDescs" : [ ]
+  "uriDescs" : [ {
+    "fieldName" : "target",
+    "fieldExtractor" : "SubqueryAliasURIExtractor",
+    "isInput" : false
+  } ]
 } ]

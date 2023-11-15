@@ -1932,6 +1932,16 @@ object KyuubiConf {
       .stringConf
       .createWithDefault("server_operation_logs")
 
+  val PROXY_USER: OptionalConfigEntry[String] =
+    buildConf("kyuubi.session.proxy.user")
+      .doc("An alternative to hive.server2.proxy.user. " +
+        "The current behavior is consistent with hive.server2.proxy.user " +
+        "and now only takes effect in RESTFul API. " +
+        "When both parameters are set, kyuubi.session.proxy.user takes precedence.")
+      .version("1.9.0")
+      .stringConf
+      .createOptional
+
   @deprecated("using kyuubi.engine.share.level instead", "1.2.0")
   val LEGACY_ENGINE_SHARE_LEVEL: ConfigEntry[String] =
     buildConf("kyuubi.session.engine.share.level")
@@ -3153,4 +3163,24 @@ object KyuubiConf {
       .serverOnly
       .intConf
       .createOptional
+
+  val KUBERNETES_FORCIBLY_REWRITE_DRIVER_POD_NAME: ConfigEntry[Boolean] =
+    buildConf("kyuubi.kubernetes.spark.forciblyRewriteDriverPodName.enabled")
+      .doc("Whether to forcibly rewrite Spark driver pod name with 'kyuubi-<uuid>-driver'. " +
+        "If disabled, Kyuubi will try to preserve the application name while satisfying K8s' " +
+        "pod name policy, but some vendors may have stricter pod name policies, thus the " +
+        "generated name may become illegal.")
+      .version("1.8.1")
+      .booleanConf
+      .createWithDefault(false)
+
+  val KUBERNETES_FORCIBLY_REWRITE_EXEC_POD_NAME_PREFIX: ConfigEntry[Boolean] =
+    buildConf("kyuubi.kubernetes.spark.forciblyRewriteExecutorPodNamePrefix.enabled")
+      .doc("Whether to forcibly rewrite Spark executor pod name prefix with 'kyuubi-<uuid>'. " +
+        "If disabled, Kyuubi will try to preserve the application name while satisfying K8s' " +
+        "pod name policy, but some vendors may have stricter Pod name policies, thus the " +
+        "generated name may become illegal.")
+      .version("1.8.1")
+      .booleanConf
+      .createWithDefault(false)
 }

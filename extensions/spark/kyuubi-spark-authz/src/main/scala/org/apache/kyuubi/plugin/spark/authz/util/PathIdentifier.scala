@@ -15,11 +15,17 @@
  * limitations under the License.
  */
 
-import request from '@/utils/request'
+package org.apache.kyuubi.plugin.spark.authz.util
 
-export function getAllServer(): any {
-  return request({
-    url: 'api/v1/admin/server',
-    method: 'get'
-  })
+import java.io.File
+
+import org.apache.spark.sql.SparkSession
+
+/**
+ * An object for handling table access on path-based table. This is a stop-gap solution
+ * until PathIdentifiers are implemented in Apache Spark.
+ */
+object PathIdentifier {
+  def isPathIdentifier(path: String, spark: SparkSession): Boolean =
+    spark.sessionState.conf.runSQLonFile && path != null && path.startsWith(File.separator)
 }
