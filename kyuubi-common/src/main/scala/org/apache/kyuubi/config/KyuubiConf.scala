@@ -1516,6 +1516,22 @@ object KyuubiConf {
       .timeConf
       .createWithDefault(Duration.ofSeconds(10).toMillis)
 
+  object EngineOpenOnFailure extends Enumeration {
+    type EngineOpenOnFailure = Value
+    val RETRY, DEREGISTER_IMMEDIATELY, DEREGISTER_AFTER_RETRY = Value
+  }
+
+  val ENGINE_OPEN_ON_FAILURE: ConfigEntry[String] =
+    buildConf("kyuubi.session.engine.open.onFailure")
+      .doc("The behavior when opening engine failed: <ul>" +
+        s" <li>RETRY: retry to open engine for ${ENGINE_OPEN_MAX_ATTEMPTS.key} times.</li>" +
+        " <li>DEREGISTER_IMMEDIATELY: deregister the engine immediately.</li>" +
+        " <li>DEREGISTER_AFTER_RETRY: deregister the engine after retry to open engine for " +
+        s"${ENGINE_OPEN_MAX_ATTEMPTS.key} times.</li></ul>")
+      .version("1.8.1")
+      .stringConf
+      .createWithDefault(EngineOpenOnFailure.RETRY.toString)
+
   val ENGINE_INIT_TIMEOUT: ConfigEntry[Long] = buildConf("kyuubi.session.engine.initialize.timeout")
     .doc("Timeout for starting the background engine, e.g. SparkSQLEngine.")
     .version("1.0.0")
@@ -3257,6 +3273,20 @@ object KyuubiConf {
       .version("1.9.0")
       .booleanConf
       .createWithDefault(true)
+
+  object EngineSparkOutputMode extends Enumeration {
+    type EngineSparkOutputMode = Value
+    val AUTO, NOTEBOOK = Value
+  }
+
+  val ENGINE_SPARK_OUTPUT_MODE: ConfigEntry[String] =
+    buildConf("kyuubi.engine.spark.output.mode")
+      .doc("The output mode of Spark engine: <ul>" +
+        " <li>AUTO: For PySpark, the extracted `text/plain` from python response as output.</li>" +
+        " <li>NOTEBOOK: For PySpark, the original python response as output.</li></ul>")
+      .version("1.9.0")
+      .stringConf
+      .createWithDefault(EngineSparkOutputMode.AUTO.toString)
 
   val ENGINE_SPARK_REGISTER_ATTRIBUTES: ConfigEntry[Seq[String]] =
     buildConf("kyuubi.engine.spark.register.attributes")

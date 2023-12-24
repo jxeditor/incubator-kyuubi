@@ -307,6 +307,27 @@ private[kyuubi] class EngineRef(
       }
   }
 
+  /**
+   * Deregister the engine from engine space with the given host and port on connection failure.
+   *
+   * @param discoveryClient the zookeeper client to get or create engine instance
+   * @param hostPort the existing engine host and port
+   */
+  def deregister(discoveryClient: DiscoveryClient, hostPort: (String, Int)): Unit =
+    tryWithLock(discoveryClient) {
+      // refer the DiscoveryClient::getServerHost implementation
+      discoveryClient.getServiceNodesInfo(engineSpace, Some(1), silent = true) match {
+        case Seq(sn) =>
+          if ((sn.host, sn.port) == hostPort) {
+            info(s"Deleting engine node:$sn")
+            discoveryClient.delete(s"$engineSpace/${sn.nodeName}")
+          } else {
+            warn(s"Engine node:$sn is not matched with host&port[$hostPort]")
+          }
+        case _ => warn(s"No engine node found in $engineSpace")
+      }
+    }
+
   def close(): Unit = {
     if (shareLevel == CONNECTION && builder != null) {
       try {
