@@ -757,7 +757,7 @@ object KyuubiConf {
       .stringConf
       .createWithDefault("X-Real-IP")
 
-  val AUTHENTICATION_METHOD: ConfigEntry[Set[String]] = buildConf("kyuubi.authentication")
+  val AUTHENTICATION_METHOD: ConfigEntry[Seq[String]] = buildConf("kyuubi.authentication")
     .doc("A comma-separated list of client authentication types." +
       "<ul>" +
       " <li>NOSASL: raw transport.</li>" +
@@ -793,9 +793,9 @@ object KyuubiConf {
     .serverOnly
     .stringConf
     .transformToUpperCase
-    .toSet()
+    .toSequence()
     .checkValues(AuthTypes)
-    .createWithDefault(Set(AuthTypes.NONE.toString))
+    .createWithDefault(Seq(AuthTypes.NONE.toString))
 
   val AUTHENTICATION_CUSTOM_CLASS: OptionalConfigEntry[String] =
     buildConf("kyuubi.authentication.custom.class")
@@ -1385,6 +1385,13 @@ object KyuubiConf {
     buildConf("kyuubi.session.engine.trino.connection.catalog")
       .doc("The default catalog that Trino engine will connect to")
       .version("1.5.0")
+      .stringConf
+      .createOptional
+
+  val ENGINE_TRINO_CONNECTION_USER: OptionalConfigEntry[String] =
+    buildConf("kyuubi.engine.trino.connection.user")
+      .doc("The user used for connecting to trino cluster")
+      .version("1.9.0")
       .stringConf
       .createOptional
 
@@ -2080,20 +2087,33 @@ object KyuubiConf {
       .version("1.5.0")
       .fallbackConf(ENGINE_CONNECTION_URL_USE_HOSTNAME)
 
+  val ENGINE_DO_AS_ENABLED: ConfigEntry[Boolean] =
+    buildConf("kyuubi.engine.doAs.enabled")
+      .doc("Whether to enable user impersonation on launching engine. When enabled, " +
+        "for engines which supports user impersonation, e.g. SPARK, depends on the " +
+        s"`kyuubi.engine.share.level`, different users will be used to launch the engine. " +
+        "Otherwise, Kyuubi Server's user will always be used to launch the engine.")
+      .version("1.9.0")
+      .booleanConf
+      .createWithDefault(true)
+
   val ENGINE_SHARE_LEVEL: ConfigEntry[String] = buildConf("kyuubi.engine.share.level")
     .doc("Engines will be shared in different levels, available configs are: <ul>" +
-      " <li>CONNECTION: engine will not be shared but only used by the current client" +
-      " connection</li>" +
-      " <li>USER: engine will be shared by all sessions created by a unique username," +
-      s" see also ${ENGINE_SHARE_LEVEL_SUBDOMAIN.key}</li>" +
+      " <li>CONNECTION: the engine will not be shared but only used by the current client" +
+      " connection, and the engine will be launched by session user.</li>" +
+      " <li>USER: the engine will be shared by all sessions created by a unique username," +
+      s" and the engine will be launched by session user.</li>" +
       " <li>GROUP: the engine will be shared by all sessions created" +
       " by all users belong to the same primary group name." +
-      " The engine will be launched by the group name as the effective" +
+      " The engine will be launched by the primary group name as the effective" +
       " username, so here the group name is in value of special user who is able to visit the" +
       " computing resources/data of the team. It follows the" +
       " [Hadoop GroupsMapping](https://reurl.cc/xE61Y5) to map user to a primary group. If the" +
       " primary group is not found, it fallback to the USER level." +
-      " <li>SERVER: the App will be shared by Kyuubi servers</li></ul>")
+      " <li>SERVER: the engine will be shared by Kyuubi servers, and the engine will be launched" +
+      " by Server's user.</li>" +
+      " </ul>" +
+      s" See also `${ENGINE_SHARE_LEVEL_SUBDOMAIN.key}` and `${ENGINE_DO_AS_ENABLED.key}`.")
     .version("1.2.0")
     .fallbackConf(LEGACY_ENGINE_SHARE_LEVEL)
 
@@ -2108,8 +2128,8 @@ object KyuubiConf {
       " all the capacity of the Trino.</li>" +
       " <li>HIVE_SQL: specify this engine type will launch a Hive engine which can provide" +
       " all the capacity of the Hive Server2.</li>" +
-      " <li>JDBC: specify this engine type will launch a JDBC engine which can forward " +
-      " queries to the database system through the certain JDBC driver, " +
+      " <li>JDBC: specify this engine type will launch a JDBC engine which can forward" +
+      " queries to the database system through the certain JDBC driver," +
       " for now, it supports Doris, MySQL, Phoenix, PostgreSQL and StarRocks.</li>" +
       " <li>CHAT: specify this engine type will launch a Chat engine.</li>" +
       "</ul>")
@@ -3426,7 +3446,8 @@ object KyuubiConf {
 
   val OPERATION_GET_TABLES_IGNORE_TABLE_PROPERTIES: ConfigEntry[Boolean] =
     buildConf("kyuubi.operation.getTables.ignoreTableProperties")
-      .doc("Speed up the `GetTables` operation by returning table identities only.")
+      .doc("Speed up the `GetTables` operation by ignoring `tableTypes` query criteria, " +
+        "and returning table identities only.")
       .version("1.8.0")
       .booleanConf
       .createWithDefault(false)
