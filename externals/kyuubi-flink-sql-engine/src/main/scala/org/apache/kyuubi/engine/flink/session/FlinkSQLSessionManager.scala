@@ -61,8 +61,6 @@ class FlinkSQLSessionManager(engineContext: DefaultContext)
           .setSessionEndpointVersion(SqlGatewayRestAPIVersion.V1)
           .addSessionConfig(mapAsJavaMap(conf))
           .build)
-      val sessionConfig = flinkInternalSession.getSessionConfig
-      sessionConfig.putAll(conf.asJava)
       val session = new FlinkSessionImpl(
         protocol,
         user,
@@ -83,9 +81,9 @@ class FlinkSQLSessionManager(engineContext: DefaultContext)
 
   override def closeSession(sessionHandle: SessionHandle): Unit = {
     try {
-      val fSession = super.getSessionOption(sessionHandle)
-      fSession.foreach(s =>
-        sessionManager.closeSession(s.asInstanceOf[FlinkSessionImpl].fSession.getSessionHandle))
+      super.getSessionOption(sessionHandle).foreach { s =>
+        sessionManager.closeSession(s.asInstanceOf[FlinkSessionImpl].fSession.getSessionHandle)
+      }
       super.closeSession(sessionHandle)
     } catch {
       case t: Throwable =>
